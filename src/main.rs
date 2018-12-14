@@ -1,6 +1,12 @@
 use std::fs;
 use std::path::Path;
 
+fn process_file(filepath: &str) {
+	let path = Path::new(filepath);
+	let file = path.file_name().expect("Wut");
+	println!("{:?}", file);
+}
+
 fn list_dir(path: &str) {
 	let forbidden = [ "node_modules", ".git" ];
 	let dir = Path::new(path);
@@ -15,19 +21,32 @@ fn list_dir(path: &str) {
 		return
 	}
 
-	println!("---------------- Directory: {} -----------------------", path);
 	let entries = fs::read_dir(dir)
 		.expect( "Unable to read dir" );
 
-	for entry in entries {
-		if let Ok(entry) = entry {
-			let path = entry.path();
-			if path.is_dir() {
-				list_dir(path.to_str().expect("Invalid entry"));
-			} else {
-				println!("{:?}", path);
-			}
-		}
+	entries
+		.filter_map(Result::ok)
+		.filter(|e| e.path().is_dir())
+		.for_each(|e| list_dir(e.path().to_str().expect("Invalid entry")))
+	;
+
+	let mut files = 0;
+	fs::read_dir(dir)
+		.unwrap()
+		.filter_map(Result::ok)
+		.filter_map(|e| {
+			e.path().to_str().and_then(|f| {
+				if f.ends_with("php") { Some(e) } else { None }
+			})
+		})
+		.for_each(|f| {
+			files += 1;
+			process_file(f.path().to_str().expect("Invalid path"));
+		})
+	;
+
+	if files > 0 {
+		println!("- {} files found in directory: {}", files, path);
 	}
 }
 
