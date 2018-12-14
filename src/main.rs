@@ -66,25 +66,37 @@ fn process_file(filepath: &str) {
 	let filename = path.file_name().expect("Wut");
 	
 	let contents = fs::read_to_string(filepath).unwrap();
-	let chars = contents.len();
 	let todos = find_todos(contents);
 
-	if todos > 0 {
+	if todos.len() > 0 {
 		println!(
-			"{}: {} todos ({} chars)",
+			"--- {}: {} todos ---",
 			filename.to_str().unwrap(),
-			todos,
-			chars
+			todos.len()
 		);
+		for todo in todos {
+			println!("{:?}", todo);
+		}
 	}
 }
 
-fn find_todos(content: String) -> u32 {
-	let mut todos = 0;
+fn find_todos(content: String) -> Vec<Todo> {
+	let mut todos = Vec::new();
 	content.lines()
 		.for_each(|line| {
-			if line.contains("TODO") { todos += 1 }
+			if line.contains("TODO") {
+				todos.push(Todo {
+					line: line.trim().to_string(),
+					context: String::new(),
+				});
+			}
 		})
 	;
 	return todos;
+}
+
+#[derive(Debug)]
+struct Todo {
+	line: String,
+	context: String,
 }
