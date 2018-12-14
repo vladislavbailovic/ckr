@@ -12,13 +12,7 @@ fn list_dir(path: &str) {
 	}
 
 	process_dir(dir);
-	let files = process_files(dir);
-
-/*
-	if files > 0 {
-		println!("- {} files found in directory: {}", files, path);
-	}
-*/
+	process_files(dir);
 }
 
 fn is_skip_dir(dir: &Path) -> bool {
@@ -66,7 +60,7 @@ fn process_file(filepath: &str) {
 	let filename = path.file_name().expect("Wut");
 	
 	let contents = fs::read_to_string(filepath).unwrap();
-	let todos = find_todos(contents);
+	let todos = get_todos_in_file(path, contents);
 
 	if todos.len() > 0 {
 		println!(
@@ -80,13 +74,25 @@ fn process_file(filepath: &str) {
 	}
 }
 
-fn find_todos(content: String) -> Vec<Todo> {
+fn get_todos_in_file(path: &Path, content: String) -> Vec<Todo> {
 	let mut todos = Vec::new();
+	let todo_str = "TODO";
 	content.lines()
-		.for_each(|line| {
-			if line.contains("TODO") {
+		.enumerate().for_each(|(idx, line)| {
+			if line.contains(todo_str) {
+				let char_pos = line.find(todo_str).unwrap();
+				let line = line
+					.replace("/*", "")
+					.replace("*", "")
+					.replace("*/", "")
+					.replace("//", "")
+					.replace("@", "")
+				;
 				todos.push(Todo {
-					line: line.trim().to_string(),
+					path: path.to_str().unwrap().to_string(),
+					line: idx,
+					char: char_pos,
+					todo: line.trim().to_string(),
 					context: String::new(),
 				});
 			}
@@ -97,6 +103,9 @@ fn find_todos(content: String) -> Vec<Todo> {
 
 #[derive(Debug)]
 struct Todo {
-	line: String,
+	path: String,
+	line: usize,
+	char: usize,
+	todo: String,
 	context: String,
 }
