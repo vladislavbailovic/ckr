@@ -1,12 +1,24 @@
 use std::fs;
 use std::path::Path;
 
-fn process_file(filepath: &str) {
-	let path = Path::new(filepath);
-	let filename = path.file_name().expect("Wut");
-	
-	let contents = fs::read_to_string(filepath).unwrap();
-	println!("{}: {} chars", filename.to_str().unwrap(), contents.len());
+fn main() {
+	list_dir("/home/ve/Env/wpd/projects/plugins/shipper");
+}
+
+fn list_dir(path: &str) {
+	let dir = Path::new(path);
+	if is_skip_dir(dir) {
+		return;
+	}
+
+	process_dir(dir);
+	let files = process_files(dir);
+
+/*
+	if files > 0 {
+		println!("- {} files found in directory: {}", files, path);
+	}
+*/
 }
 
 fn is_skip_dir(dir: &Path) -> bool {
@@ -49,20 +61,30 @@ fn process_files(dir: &Path) -> u32 {
 	return files;
 }
 
-fn list_dir(path: &str) {
-	let dir = Path::new(path);
-	if is_skip_dir(dir) {
-		return;
-	}
+fn process_file(filepath: &str) {
+	let path = Path::new(filepath);
+	let filename = path.file_name().expect("Wut");
+	
+	let contents = fs::read_to_string(filepath).unwrap();
+	let chars = contents.len();
+	let todos = find_todos(contents);
 
-	process_dir(dir);
-	let files = process_files(dir);
-
-	if files > 0 {
-		println!("- {} files found in directory: {}", files, path);
+	if todos > 0 {
+		println!(
+			"{}: {} todos ({} chars)",
+			filename.to_str().unwrap(),
+			todos,
+			chars
+		);
 	}
 }
 
-fn main() {
-	list_dir("/home/ve/Env/wpd/projects/plugins/shipper");
+fn find_todos(content: String) -> u32 {
+	let mut todos = 0;
+	content.lines()
+		.for_each(|line| {
+			if line.contains("TODO") { todos += 1 }
+		})
+	;
+	return todos;
 }
