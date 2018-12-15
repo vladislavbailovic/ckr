@@ -13,8 +13,17 @@ fn main() {
 		}
 	}
 
-	let fmt = ConsoleFormatter{ storage: storage };
+	let fmt = get_formatter("html", storage);
 	fmt.print();
+}
+
+fn get_formatter(format: &str, storage: TodoStorage) -> Box<Formatter> {
+	let fmt: Box<Formatter> = match format {
+		"console" => Box::new( ConsoleFormatter{ storage: storage } ),
+		"html" => Box::new( HtmlFormatter{ storage: storage } ),
+		_ => Box::new( ConsoleFormatter{ storage: storage } ),
+	};
+	return fmt;
 }
 
 fn get_files(path: &str) -> Vec<PathBuf> {
@@ -128,13 +137,14 @@ impl TodoStorage {
 	}
 }
 
-trait Print {
+trait Formatter {
 	fn print(&self);
 }
+
 struct HtmlFormatter {
 	storage: TodoStorage
 }
-impl Print for HtmlFormatter {
+impl Formatter for HtmlFormatter {
 	fn print(&self) {
 		for ft in self.storage.todos.iter() {
 			println!("HTML: {:?}", ft);
@@ -145,7 +155,7 @@ impl Print for HtmlFormatter {
 struct ConsoleFormatter {
 	storage: TodoStorage
 }
-impl Print for ConsoleFormatter {
+impl Formatter for ConsoleFormatter {
 	fn print(&self) {
 		for ft in self.storage.todos.iter() {
 			println!("Console {:?}", ft);
