@@ -7,7 +7,9 @@ use walkdir::WalkDir;
 fn main() {
     let files = list_dir("/home/ve/Env/wpd/projects/plugins/shipper");
 	for file in files {
-		process_file(file.to_str().unwrap());
+		if let Some(file_todo) = process_file(file.to_str().unwrap()) {
+			println!("{:?}", file_todo);
+		}
 	}
 }
 
@@ -55,28 +57,20 @@ fn has_whitelisted_extension(path: &Path, whitelist: &Vec<&str>) -> bool {
 }
 
 
-fn process_file(filepath: &str) {
-    let path = Path::new(filepath);
-    let filename = path.file_name().expect("Wut");
-
+fn process_file(filepath: &str) -> Option<FileTodos> {
     let contents = fs::read_to_string(filepath).unwrap();
     let raw_todos = get_todos(contents);
 
-    if raw_todos.len() > 0 {
-        println!(
-            "--- {}: {} todos ---",
-            filename.to_str().unwrap(),
-            raw_todos.len()
-        );
-		let file_todo = FileTodos {
-			path: filepath.to_string(),
-			todos: raw_todos,
-		};
+    if raw_todos.len() <= 0 {
+		return None;
+	}
 
-		for todo in file_todo.todos {
-            println!("{:?}", todo);
-		}
-    }
+	let file_todo = FileTodos {
+		path: filepath.to_string(),
+		todos: raw_todos,
+	};
+
+	return Some(file_todo);
 }
 
 fn get_todos(content: String) -> Vec<Todo> {
