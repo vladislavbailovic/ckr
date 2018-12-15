@@ -4,26 +4,20 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
+mod formatter;
+mod todo;
+
 fn main() {
     let files = get_files("/home/ve/Env/wpd/projects/plugins/shipper");
-	let mut storage = TodoStorage::new();
+	let mut storage = todo::TodoStorage::new();
 	for file in files {
 		if let Some(file_todo) = get_file_todos(file.to_str().unwrap()) {
 			storage.add(file_todo);
 		}
 	}
 
-	let fmt = get_formatter("html", storage);
+	let fmt = formatter::get_formatter("html", storage);
 	fmt.print();
-}
-
-fn get_formatter(format: &str, storage: TodoStorage) -> Box<Formatter> {
-	let fmt: Box<Formatter> = match format {
-		"console" => Box::new( ConsoleFormatter{ storage: storage } ),
-		"html" => Box::new( HtmlFormatter{ storage: storage } ),
-		_ => Box::new( ConsoleFormatter{ storage: storage } ),
-	};
-	return fmt;
 }
 
 fn get_files(path: &str) -> Vec<PathBuf> {
@@ -70,7 +64,7 @@ fn has_whitelisted_extension(path: &Path, whitelist: &Vec<&str>) -> bool {
 }
 
 
-fn get_file_todos(filepath: &str) -> Option<FileTodos> {
+fn get_file_todos(filepath: &str) -> Option<todo::FileTodos> {
     let contents = fs::read_to_string(filepath).unwrap();
     let raw_todos = get_todos(contents);
 
@@ -78,7 +72,7 @@ fn get_file_todos(filepath: &str) -> Option<FileTodos> {
 		return None;
 	}
 
-	let file_todo = FileTodos {
+	let file_todo = todo::FileTodos {
 		path: filepath.to_string(),
 		todos: raw_todos,
 	};
@@ -86,7 +80,7 @@ fn get_file_todos(filepath: &str) -> Option<FileTodos> {
 	return Some(file_todo);
 }
 
-fn get_todos(content: String) -> Vec<Todo> {
+fn get_todos(content: String) -> Vec<todo::Todo> {
     let mut todos = Vec::new();
     let todo_str = "TODO";
     content.lines().enumerate().for_each(|(idx, line)| {
@@ -98,7 +92,7 @@ fn get_todos(content: String) -> Vec<Todo> {
                 .replace("*/", "")
                 .replace("//", "")
                 .replace("@", "");
-            todos.push(Todo {
+            todos.push(todo::Todo {
                 line: idx,
                 char: char_pos,
                 todo: line.trim().to_string(),
@@ -107,58 +101,4 @@ fn get_todos(content: String) -> Vec<Todo> {
         }
     });
     return todos;
-}
-
-#[derive(Debug)]
-struct Todo {
-    line: usize,
-    char: usize,
-    todo: String,
-    context: String,
-}
-
-#[derive(Debug)]
-struct FileTodos {
-    path: String,
-	todos: Vec<Todo>,
-}
-
-struct TodoStorage {
-	todos: Vec<FileTodos>
-}
-impl TodoStorage {
-	fn new() -> Self {
-		TodoStorage {
-			todos: Vec::new()
-		}
-	}
-	fn add(&mut self, item: FileTodos) {
-		&self.todos.push(item);
-	}
-}
-
-trait Formatter {
-	fn print(&self);
-}
-
-struct HtmlFormatter {
-	storage: TodoStorage
-}
-impl Formatter for HtmlFormatter {
-	fn print(&self) {
-		for ft in self.storage.todos.iter() {
-			println!("HTML: {:?}", ft);
-		}
-	}
-}
-
-struct ConsoleFormatter {
-	storage: TodoStorage
-}
-impl Formatter for ConsoleFormatter {
-	fn print(&self) {
-		for ft in self.storage.todos.iter() {
-			println!("Console {:?}", ft);
-		}
-	}
 }
