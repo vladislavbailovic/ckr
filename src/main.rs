@@ -52,9 +52,10 @@ fn list_dir(path: &str) {
 		})
 	;
 	for entry in entries {
-		println!("{:?}", entry.path().file_name());
+		files.push(entry.path());
 	}
-	//println!("{:#?}", files);
+
+	return files;
 }
 
 fn process_file(filepath: &str) {
