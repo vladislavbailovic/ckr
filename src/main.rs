@@ -1,17 +1,20 @@
 extern crate walkdir;
 
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 fn main() {
-    list_dir("/home/ve/Env/wpd/projects/plugins/shipper");
+    let files = list_dir("/home/ve/Env/wpd/projects/plugins/shipper");
+	for file in files {
+		process_file(file.to_str().unwrap());
+	}
 }
 
-fn list_dir(path: &str) {
+fn list_dir(path: &str) -> Vec<PathBuf> {
 	let skip_dirs = [ ".git", "node_modules", "build", "dist"];
 	let file_types = [ "php", "js", "scss", "css" ];
-	//let mut files = Vec::new();
+	let mut files = Vec::new();
 	let entries = WalkDir::new(path).into_iter()
 		.filter_map(|e| e.ok())
 		.filter(|e| {
@@ -52,7 +55,7 @@ fn list_dir(path: &str) {
 		})
 	;
 	for entry in entries {
-		files.push(entry.path());
+		files.push(entry.path().to_path_buf());
 	}
 
 	return files;
