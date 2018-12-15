@@ -12,6 +12,6 @@ fn main() {
 		}
 	}
 
-	let fmt = formatter::get_formatter("html", storage);
+	let fmt = formatter::get_formatter("console", storage);
 	fmt.print();
 }

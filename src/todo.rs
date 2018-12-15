@@ -9,7 +9,7 @@ pub struct Todo {
 #[derive(Debug)]
 pub struct FileTodos {
     pub path: String,
-	pub todos: Vec<Todo>,
+    pub todos: Vec<Todo>,
 }
 
 pub struct TodoStorage {
