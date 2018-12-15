@@ -4,6 +4,7 @@ mod parser;
 mod todo;
 
 fn main() {
+    // @TODO: implement CLI args parsing
     let files = files::get_files("/home/ve/Env/wpd/projects/plugins/shipper");
     let mut storage = todo::TodoStorage::new();
     for file in files {

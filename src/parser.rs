@@ -36,6 +36,8 @@ fn get_todos(content: String) -> Vec<todo::Todo> {
                 todo: line.trim().to_string(),
                 context: String::new(),
             });
+            // @TODO: add tags parsing (hashtags) #feature
+            // @TODO: add path-to-tags #feature
         }
     });
     return todos;
