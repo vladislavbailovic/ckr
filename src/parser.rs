@@ -7,15 +7,15 @@ pub fn get_file_todos(filepath: &str) -> Option<todo::FileTodos> {
     let raw_todos = get_todos(contents);
 
     if raw_todos.len() <= 0 {
-		return None;
-	}
+        return None;
+    }
 
-	let file_todo = todo::FileTodos {
-		path: filepath.to_string(),
-		todos: raw_todos,
-	};
+    let file_todo = todo::FileTodos {
+        path: filepath.to_string(),
+        todos: raw_todos,
+    };
 
-	return Some(file_todo);
+    return Some(file_todo);
 }
 
 fn get_todos(content: String) -> Vec<todo::Todo> {
@@ -40,4 +40,3 @@ fn get_todos(content: String) -> Vec<todo::Todo> {
     });
     return todos;
 }
-
