@@ -5,15 +5,19 @@ use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 fn main() {
-    let files = list_dir("/home/ve/Env/wpd/projects/plugins/shipper");
+    let files = get_files("/home/ve/Env/wpd/projects/plugins/shipper");
+	let mut storage = TodoStorage::new();
 	for file in files {
-		if let Some(file_todo) = process_file(file.to_str().unwrap()) {
-			println!("{:?}", file_todo);
+		if let Some(file_todo) = get_file_todos(file.to_str().unwrap()) {
+			storage.add(file_todo);
 		}
 	}
+
+	let fmt = ConsoleFormatter{ storage: storage };
+	fmt.print();
 }
 
-fn list_dir(path: &str) -> Vec<PathBuf> {
+fn get_files(path: &str) -> Vec<PathBuf> {
 	let skip_dirs = vec![ ".git", "node_modules", "build", "dist"];
 	let file_types = vec![ "php", "js", "scss", "css" ];
 	let mut files = Vec::new();
@@ -57,7 +61,7 @@ fn has_whitelisted_extension(path: &Path, whitelist: &Vec<&str>) -> bool {
 }
 
 
-fn process_file(filepath: &str) -> Option<FileTodos> {
+fn get_file_todos(filepath: &str) -> Option<FileTodos> {
     let contents = fs::read_to_string(filepath).unwrap();
     let raw_todos = get_todos(contents);
 
@@ -108,4 +112,43 @@ struct Todo {
 struct FileTodos {
     path: String,
 	todos: Vec<Todo>,
+}
+
+struct TodoStorage {
+	todos: Vec<FileTodos>
+}
+impl TodoStorage {
+	fn new() -> Self {
+		TodoStorage {
+			todos: Vec::new()
+		}
+	}
+	fn add(&mut self, item: FileTodos) {
+		&self.todos.push(item);
+	}
+}
+
+trait Print {
+	fn print(&self);
+}
+struct HtmlFormatter {
+	storage: TodoStorage
+}
+impl Print for HtmlFormatter {
+	fn print(&self) {
+		for ft in self.storage.todos.iter() {
+			println!("HTML: {:?}", ft);
+		}
+	}
+}
+
+struct ConsoleFormatter {
+	storage: TodoStorage
+}
+impl Print for ConsoleFormatter {
+	fn print(&self) {
+		for ft in self.storage.todos.iter() {
+			println!("Console {:?}", ft);
+		}
+	}
 }
