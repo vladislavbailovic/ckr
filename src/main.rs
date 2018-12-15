@@ -60,21 +60,26 @@ fn process_file(filepath: &str) {
     let filename = path.file_name().expect("Wut");
 
     let contents = fs::read_to_string(filepath).unwrap();
-    let todos = get_todos_in_file(path, contents);
+    let raw_todos = get_todos(contents);
 
-    if todos.len() > 0 {
+    if raw_todos.len() > 0 {
         println!(
             "--- {}: {} todos ---",
             filename.to_str().unwrap(),
-            todos.len()
+            raw_todos.len()
         );
-        for todo in todos {
+		let file_todo = FileTodos {
+			path: filepath.to_string(),
+			todos: raw_todos,
+		};
+
+		for todo in file_todo.todos {
             println!("{:?}", todo);
-        }
+		}
     }
 }
 
-fn get_todos_in_file(path: &Path, content: String) -> Vec<Todo> {
+fn get_todos(content: String) -> Vec<Todo> {
     let mut todos = Vec::new();
     let todo_str = "TODO";
     content.lines().enumerate().for_each(|(idx, line)| {
@@ -87,7 +92,6 @@ fn get_todos_in_file(path: &Path, content: String) -> Vec<Todo> {
                 .replace("//", "")
                 .replace("@", "");
             todos.push(Todo {
-                path: path.to_str().unwrap().to_string(),
                 line: idx,
                 char: char_pos,
                 todo: line.trim().to_string(),
@@ -100,9 +104,14 @@ fn get_todos_in_file(path: &Path, content: String) -> Vec<Todo> {
 
 #[derive(Debug)]
 struct Todo {
-    path: String,
     line: usize,
     char: usize,
     todo: String,
     context: String,
+}
+
+#[derive(Debug)]
+struct FileTodos {
+    path: String,
+	todos: Vec<Todo>,
 }
