@@ -10,13 +10,14 @@ fn main() {
 
 fn list_dir(path: &str) {
 	let skip_dirs = [ ".git", "node_modules", "build", "dist"];
+	let file_types = [ "php", "js", "scss", "css" ];
 	//let mut files = Vec::new();
 	let entries = WalkDir::new(path).into_iter()
 		.filter_map(|e| e.ok())
 		.filter(|e| {
+			// Filter blacklisted directories - skip the excluded ones.
 			let path = e.path();
-			if !path.is_dir() {
-				// Files filtered separately.
+			if path.is_dir() {
 				return false;
 			}
 			
@@ -29,6 +30,25 @@ fn list_dir(path: &str) {
 			}
 			
 			return true;
+		})
+		.filter(|e| {
+			// Filter whitelisted file types - only the included file types.
+			let path = e.path();
+			if path.is_dir() {
+				return false;
+			}
+
+			let extension = match path.extension() {
+				None => "",
+				Some(a) => a.to_str().unwrap(),
+			};
+			for file_type in file_types.iter() {
+				if extension == *file_type {
+					return true;
+				}
+			}
+			
+			return false;
 		})
 	;
 	for entry in entries {
