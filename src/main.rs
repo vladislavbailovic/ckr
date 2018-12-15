@@ -1,4 +1,4 @@
-extern crate glob;
+extern crate walkdir;
 
 use std::fs;
 use std::path::Path;
@@ -10,20 +10,31 @@ fn main() {
 
 fn list_dir(path: &str) {
 	let skip_dirs = [ ".git", "node_modules", "build", "dist"];
-	let files = WalkDir::new(path).into_iter()
+	//let mut files = Vec::new();
+	let entries = WalkDir::new(path).into_iter()
 		.filter_map(|e| e.ok())
-		.filter_map(|e| {
+		.filter(|e| {
 			let path = e.path();
 			if !path.is_dir() {
 				// Files filtered separately.
-				return None;
-
-			match 
-			return Some(e);
+				return false;
+			}
+			
+			let dirname = path.to_str().unwrap();
+			for dir in skip_dirs.iter() {
+				let skip_path = format!("/{}/", dir);
+				if dirname.contains(skip_path.as_str()) {
+					return false;
+				}
+			}
+			
+			return true;
 		})
-		.collect::<Vec<_>>()
 	;
-	println!("{:#?}", files);
+	for entry in entries {
+		println!("{:?}", entry.path().file_name());
+	}
+	//println!("{:#?}", files);
 }
 
 fn process_file(filepath: &str) {
