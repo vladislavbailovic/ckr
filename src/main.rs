@@ -11,11 +11,19 @@ fn main() {
         .arg(Arg::with_name("DIRECTORY")
              .help("Directory to process")
              .takes_value(true))
+        .arg(Arg::with_name("format")
+             .short("f")
+             .long("format")
+             .takes_value(true)
+             .help("Output format")
+             .value_name("FORMAT"))
         .get_matches();
     let current_dir = &std::env::current_dir().unwrap()
         .into_os_string().into_string().unwrap();
     let dir = args.value_of("DIRECTORY")
         .unwrap_or(current_dir);
+    let format = args.value_of("format")
+        .unwrap_or("console");
 
     let files = files::get_files(dir);
     let mut storage = todo::TodoStorage::new();
@@ -25,6 +33,6 @@ fn main() {
         }
     }
 
-    let fmt = formatter::get_formatter("console", storage);
+    let fmt = formatter::get_formatter(format, storage);
     fmt.print();
 }
