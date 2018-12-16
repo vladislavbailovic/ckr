@@ -16,7 +16,7 @@ fn main() {
         .into_os_string().into_string().unwrap();
     let dir = args.value_of("DIRECTORY")
         .unwrap_or(current_dir);
-    // @TODO: implement CLI args parsing
+
     let files = files::get_files(dir);
     let mut storage = todo::TodoStorage::new();
     for file in files {
