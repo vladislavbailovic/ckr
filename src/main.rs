@@ -7,7 +7,7 @@ extern crate clap;
 use clap::{Arg, App};
 
 fn main() {
-    let args = App::new("ckr")
+    let args = App::new("")
         .arg(Arg::with_name("DIRECTORY")
              .help("Directory to process")
              .takes_value(true))
