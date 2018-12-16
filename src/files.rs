@@ -5,7 +5,7 @@ use walkdir::WalkDir;
 
 pub fn get_files(path: &str) -> Vec<PathBuf> {
     let skip_dirs = vec![".git", "node_modules", "build", "dist"];
-    let file_types = vec!["php", "js", "scss", "css"];
+    let file_types = vec!["rs", "php", "js", "scss", "css"];
     let mut files = Vec::new();
     let entries = WalkDir::new(path)
         .into_iter()
