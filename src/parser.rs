@@ -23,7 +23,7 @@ fn get_todos(content: String) -> Vec<todo::Todo> {
     let todo_str = "TODO";
     content.lines().enumerate().for_each(|(idx, line)| {
         if line.contains(todo_str) {
-            // @TODO: clean this up, make the parser less naive
+            // @TODO: make the parser less naive
             let q = format!(r#""{}"#, todo_str);
             if line.contains(q.as_str()) {
                 return;

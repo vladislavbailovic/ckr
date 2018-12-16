@@ -15,6 +15,8 @@ fn main() {
              .short("f")
              .long("format")
              .takes_value(true)
+             .possible_values(&["console", "html"])
+             .default_value("console")
              .help("Output format")
              .value_name("FORMAT"))
         .get_matches();
@@ -22,8 +24,7 @@ fn main() {
         .into_os_string().into_string().unwrap();
     let dir = args.value_of("DIRECTORY")
         .unwrap_or(current_dir);
-    let format = args.value_of("format")
-        .unwrap_or("console");
+    let format = args.value_of("format").unwrap();
 
     let files = files::get_files(dir);
     let mut storage = todo::TodoStorage::new();
