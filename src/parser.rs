@@ -21,30 +21,36 @@ pub fn get_file_todos(filepath: &str) -> Option<todo::FileTodos> {
 fn get_todos(content: String) -> Vec<todo::Todo> {
     let mut todos = Vec::new();
     let todo_str = "TODO";
-    content.lines().enumerate().for_each(|(idx, line)| {
+    let lines = content.lines();
+    for (idx, line) in lines.enumerate() {
         if line.contains(todo_str) {
             // @TODO: make the parser less naive
             let q = format!(r#""{}"#, todo_str);
             if line.contains(q.as_str()) {
-                return;
+                continue;
             }
 
             let char_pos = line.find(todo_str).unwrap();
-            let line = line
-                .replace("/*", "")
-                .replace("*", "")
-                .replace("*/", "")
-                .replace("//", "")
-                .replace("@", "");
             todos.push(todo::Todo {
                 line: idx,
                 char: char_pos,
-                todo: line.trim().to_string(),
+                todo: get_clean_todo_line(line.to_string()),
                 context: String::new(),
             });
             // @TODO: add tags parsing (hashtags) #feature
             // @TODO: add path-to-tags #feature
         }
-    });
+    };
     return todos;
+}
+
+fn get_clean_todo_line(line: String) -> String {
+    return line
+        .replace("/*", "")
+        .replace("*", "")
+        .replace("*/", "")
+        .replace("//", "")
+        .replace("@", "")
+        .trim()
+        .to_string();
 }
