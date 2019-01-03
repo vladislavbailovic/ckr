@@ -40,7 +40,7 @@ fn get_todos(content: String) -> Vec<todo::Todo> {
             // @TODO: add tags parsing (hashtags) #feature
             // @TODO: add path-to-tags #feature
         }
-    };
+    }
     return todos;
 }
 

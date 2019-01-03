@@ -8,6 +8,7 @@ pub fn get_formatter(format: &str, storage: TodoStorage) -> Box<Formatter> {
         "console" => Box::new(console::ConsoleFormatter { storage: storage }),
         // @TODO: add fancy console formatter with more info #feature
         "html" => Box::new(html::HtmlFormatter { storage: storage }),
+        // @TODO: add JSON formatter #feature
         _ => Box::new(console::ConsoleFormatter { storage: storage }),
     };
     return fmt;

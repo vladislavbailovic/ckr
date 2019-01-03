@@ -15,13 +15,16 @@ pub struct FileTodos {
 pub struct TodoStorage {
     pub todos: Vec<FileTodos>,
 }
+
 impl TodoStorage {
     pub fn new() -> Self {
         TodoStorage { todos: Vec::new() }
     }
+
     pub fn add(&mut self, item: FileTodos) {
         &self.todos.push(item);
     }
+
     pub fn get_all(&self) -> &Vec<FileTodos> {
         return &self.todos;
     }

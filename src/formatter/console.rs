@@ -6,6 +6,7 @@ const MAX_WIDTH: usize = 210;
 pub struct ConsoleFormatter {
     pub storage: TodoStorage,
 }
+
 impl formatter::Formatter for ConsoleFormatter {
     fn print(&self) {
         for ft in self.storage.get_all().iter() {

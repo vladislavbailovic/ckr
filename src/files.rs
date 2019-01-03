@@ -24,10 +24,7 @@ pub fn get_files(path: &str, blacklist_str: &str, whitelist_str: &str) -> Vec<Pa
 }
 
 fn get_comma_separated_list<'a>(from: &'a str) -> Vec<&'a str> {
-    return from
-        .split(',')
-        .map(|e| e.trim() )
-        .collect();
+    return from.split(',').map(|e| e.trim()).collect();
 }
 
 fn get_augmented_list<'a>(comma_separated: &'a str, default_list: Vec<&'a str>) -> Vec<&'a str> {
@@ -35,12 +32,12 @@ fn get_augmented_list<'a>(comma_separated: &'a str, default_list: Vec<&'a str>) 
     let mut dflt: Vec<&str> = get_comma_separated_list(comma_separated)
         .into_iter()
         .filter_map(|what| {
-            if what.is_empty() { return None; }
+            if what.is_empty() {
+                return None;
+            }
             if what.contains("+") {
                 include_default = true;
-                return Some(
-                    what.trim_matches('+')
-                );
+                return Some(what.trim_matches('+'));
             }
             return Some(what);
         })
