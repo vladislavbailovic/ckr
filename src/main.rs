@@ -26,7 +26,7 @@ fn main() {
         .unwrap_or(current_dir);
     let format = args.value_of("format").unwrap();
 
-    let files = files::get_files(dir);
+    let files = files::get_files(dir, "", "");
     let mut storage = todo::TodoStorage::new();
     for file in files {
         if let Some(file_todo) = parser::get_file_todos(file.to_str().unwrap()) {
