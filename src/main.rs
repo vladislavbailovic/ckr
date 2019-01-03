@@ -25,6 +25,12 @@ fn main() {
              .takes_value(true)
              .help("Comma-separated file extensions - preceed with '+' to add to default set")
              .value_name("EXTENSIONS"))
+        .arg(Arg::with_name("exclusions")
+             .short("e")
+             .long("exclusions")
+             .takes_value(true)
+             .help("Comma-separated path exclusions - preceed with '+' to add to default set")
+             .value_name("EXCLUSIONS"))
         .get_matches();
     let current_dir = &std::env::current_dir().unwrap()
         .into_os_string().into_string().unwrap();
@@ -32,8 +38,9 @@ fn main() {
         .unwrap_or(current_dir);
     let format = args.value_of("format").unwrap();
     let types = args.value_of("types").unwrap_or("");
+    let exclusions = args.value_of("exclusions").unwrap_or("");
 
-    let files = files::get_files(dir, "", "+rs");
+    let files = files::get_files(dir, exclusions, types);
     let mut storage = todo::TodoStorage::new();
     for file in files {
         if let Some(file_todo) = parser::get_file_todos(file.to_str().unwrap()) {

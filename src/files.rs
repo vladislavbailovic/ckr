@@ -4,8 +4,7 @@ use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 const DEFAULT_EXCLUDED_PATHS: [&str; 4] = [".git", "node_modules", "build", "dist"];
-//const DEFAULT_FILE_TYPES: [&str; 5] = ["rs", "php", "js", "scss", "css"];
-const DEFAULT_FILE_TYPES: [&str; 4] = ["php", "js", "scss", "css"];
+const DEFAULT_FILE_TYPES: [&str; 5] = ["rs", "php", "js", "scss", "css"];
 
 pub fn get_files(path: &str, blacklist_str: &str, whitelist_str: &str) -> Vec<PathBuf> {
     let skip_dirs = get_augmented_list(blacklist_str, DEFAULT_EXCLUDED_PATHS.to_vec());
