@@ -3,9 +3,12 @@ extern crate walkdir;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
+const DEFAULT_EXCLUDED_PATHS: [&str; 4] = [".git", "node_modules", "build", "dist"];
+const DEFAULT_FILE_TYPES: [&str; 5] = ["rs", "php", "js", "scss", "css"];
+
 pub fn get_files(path: &str) -> Vec<PathBuf> {
-    let skip_dirs = vec![".git", "node_modules", "build", "dist"];
-    let file_types = vec!["rs", "php", "js", "scss", "css"];
+    let skip_dirs = get_directories_blacklist();
+    let file_types = get_file_types_whitelist();
     let mut files = Vec::new();
     let entries = WalkDir::new(path)
         .into_iter()
@@ -18,6 +21,14 @@ pub fn get_files(path: &str) -> Vec<PathBuf> {
     }
 
     return files;
+}
+
+fn get_directories_blacklist<'a>() -> Vec<&'a str> {
+    return DEFAULT_EXCLUDED_PATHS.to_vec();
+}
+
+fn get_file_types_whitelist<'a>() -> Vec<&'a str> {
+    return DEFAULT_FILE_TYPES.to_vec();
 }
 
 fn is_in_blacklisted_dir(path: &Path, blacklist: &Vec<&str>) -> bool {
