@@ -4,7 +4,8 @@ use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 const DEFAULT_EXCLUDED_PATHS: [&str; 4] = [".git", "node_modules", "build", "dist"];
-const DEFAULT_FILE_TYPES: [&str; 5] = ["rs", "php", "js", "scss", "css"];
+//const DEFAULT_FILE_TYPES: [&str; 5] = ["rs", "php", "js", "scss", "css"];
+const DEFAULT_FILE_TYPES: [&str; 4] = ["php", "js", "scss", "css"];
 
 pub fn get_files(path: &str, blacklist_str: &str, whitelist_str: &str) -> Vec<PathBuf> {
     let skip_dirs = get_augmented_list(blacklist_str, DEFAULT_EXCLUDED_PATHS.to_vec());
@@ -24,14 +25,30 @@ pub fn get_files(path: &str, blacklist_str: &str, whitelist_str: &str) -> Vec<Pa
 }
 
 fn get_comma_separated_list<'a>(from: &'a str) -> Vec<&'a str> {
-    return vec![from];
+    return from
+        .split(',')
+        .map(|e| e.trim() )
+        .collect();
 }
 
 fn get_augmented_list<'a>(comma_separated: &'a str, default_list: Vec<&'a str>) -> Vec<&'a str> {
-    let mut dflt: Vec<&str> = vec![];
-    let parsed = get_comma_separated_list(comma_separated);
-    dflt.extend(parsed);
-    dflt.extend(default_list.to_vec());
+    let mut include_default = false;
+    let mut dflt: Vec<&str> = get_comma_separated_list(comma_separated)
+        .into_iter()
+        .filter_map(|what| {
+            if what.is_empty() { return None; }
+            if what.contains("+") {
+                include_default = true;
+                return Some(
+                    what.trim_matches('+')
+                );
+            }
+            return Some(what);
+        })
+        .collect();
+    if include_default || 0 == dflt.len() {
+        dflt.extend(default_list.to_vec());
+    }
     return dflt;
 }
 
